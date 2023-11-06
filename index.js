@@ -50,8 +50,18 @@ async function run() {
     });
 
     app.get("/fooditems", async (req, res) => {
-      const foodItems = await foodsCollection.find().toArray();
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      const foodItems = await foodsCollection
+        .find()
+        .skip(page * size)
+        .limit(size)
+        .toArray();
       res.send(foodItems);
+    });
+    app.get("/foodItemsCount", async (req, res) => {
+      const count = await foodsCollection.estimatedDocumentCount();
+      res.send({ count });
     });
 
     console.log(
