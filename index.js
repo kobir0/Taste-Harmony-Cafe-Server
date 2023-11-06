@@ -34,35 +34,9 @@ async function run() {
     });
 
     // post method for addFoodItem
-    // foodCollection.createIndex({ foodName: 1 }, { unique: true });
-    // app.post("/addItem", async (req, res) => {
-    //   const newFoodItem = req.body;
-    //   const queryFoodName = newFoodItem.foodName;
-    //   const existingFoodItem = await foodsCollection.findOne({
-    //     foodName: queryFoodName,
-    //   });
-    //   const result = await foodsCollection.insertOne(newFoodItem);
-    //   res.send(result);
-
-    //   if (existingFoodItem) {
-    //     return res.status(200).json({ message: "Food item already exists" });
-    //   } else {
-    //     if (result.insertedCount === 1) {
-    //       res.send(result);
-    //       return res
-    //         .status(201)
-    //         .json({ message: "Food item added successfully" });
-    //     } else {
-    //       return res
-    //         .status(500)
-    //         .json({ message: "An error occurred while adding the food item" });
-    //     }
-    //   }
-    // });
-
     app.post("/addItem", async (req, res) => {
-      const newitem = req?.body;
-      const queryFoodName = newitem?.foodName;
+      const newFoodItem = req?.body;
+      const queryFoodName = newFoodItem?.foodName;
       const existingFoodItem = await foodsCollection.findOne({
         foodName: queryFoodName,
       });
@@ -70,9 +44,14 @@ async function run() {
       if (existingFoodItem) {
         return res.send({ message: "Already Exists" });
       } else {
-        const result = foodsCollection.insertOne(newitem);
-        res.send({ message: "Added" });
+        const result = await foodsCollection.insertOne(newFoodItem);
+        res.send({ message: "Added", ...result });
       }
+    });
+
+    app.get("/fooditems", async (req, res) => {
+      const foodItems = await foodsCollection.find().toArray();
+      res.send(foodItems);
     });
 
     console.log(
