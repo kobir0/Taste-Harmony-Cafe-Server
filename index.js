@@ -36,14 +36,15 @@ async function run() {
     });
 
     // post method for addFoodItem
-    foodCollection.createIndex({ foodName: 1 }, { unique: true });
+    // foodCollection.createIndex({ foodName: 1 }, { unique: true });
     app.post("/addfood", async (req, res) => {
       const newFoodItem = req.body;
+      const queryFoodName = newFoodItem.foodName;
       const existingFoodItem = await foodCollection.findOne({
-        name: newFoodItem.foodName,
+        foodName: queryFoodName,
       });
       if (existingFoodItem) {
-        return res.status(400).json({ message: "Food item already exists" });
+        return res.status(200).json({ message: "Food item already exists" });
       } else {
         const result = await foodCollection.insertOne(newFoodItem);
         if (result.insertedCount === 1) {
