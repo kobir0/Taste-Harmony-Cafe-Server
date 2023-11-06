@@ -26,6 +26,9 @@ async function run() {
     // database&collection
     const usersCollection = client.db("TasteHarmonyCafeDB").collection("users");
     const foodsCollection = client.db("TasteHarmonyCafeDB").collection("foods");
+    const ordersCollection = client
+      .db("TasteHarmonyCafeDB")
+      .collection("orders");
 
     // post method for users
     app.post("/users", async (req, res) => {
@@ -62,6 +65,55 @@ async function run() {
     app.get("/foodItemsCount", async (req, res) => {
       const count = await foodsCollection.estimatedDocumentCount();
       res.send({ count });
+    });
+
+    // orderpost
+    app.post("/orderItems", async (req, res) => {
+      const orderItems = req.body;
+      const queryFoodName = orderItems?.foodName;
+      const existingFoodItem = await foodsCollection.findOne({
+        foodName: queryFoodName,
+      });
+      if (existingFoodItem.quantity === 0) {
+        return res.send({
+          message: "This Food Item is not Available right now.",
+        });
+      } else if (existingFoodItem.quantity < orderItems.quantity) {
+        return res.send({
+          message: "Execced Quantity, Please Select Less",
+        });
+      } else {
+        const result = await ordersCollection.insertOne(orderItems);
+        res.send(result);
+      }
+    });
+
+    app.put("/orderItem", async (req, res) => {
+      const foodItem = req.body;
+      const filter = { foodName: foodItem.foodName };
+      const orderQuantity = parseInt(foodItem.quantity);
+      const queryFoodName = foodItem?.foodName;
+      const existingFoodItem = await foodsCollection.findOne({
+        foodName: queryFoodName,
+      });
+      const availableQuantity = existingFoodItem.quantity;
+      if (availableQuantity >= orderQuantity) {
+        const restQuantity = availableQuantity - orderQuantity;
+        const count = existingFoodItem.count;
+        const presentCount = orderQuantity + count;
+        const food = {
+          $set: {
+            quantity: restQuantity,
+            count: presentCount,
+          },
+        };
+        const result = await foodsCollection.updateOne(filter, food);
+        res.send(result);
+      } else {
+        return res.send({
+          message: "This Food Item is not Available right now.",
+        });
+      }
     });
 
     console.log(
