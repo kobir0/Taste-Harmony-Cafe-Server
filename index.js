@@ -25,9 +25,7 @@ async function run() {
   try {
     // database&collection
     const usersCollection = client.db("TasteHarmonyCafeDB").collection("users");
-    const foodCollection = client
-      .db("TasteHarmonyCafeDB")
-      .collection("foodItems");
+    const foodsCollection = client.db("TasteHarmonyCafeDB").collection("foods");
 
     // post method for users
     app.post("/users", async (req, res) => {
@@ -37,26 +35,43 @@ async function run() {
 
     // post method for addFoodItem
     // foodCollection.createIndex({ foodName: 1 }, { unique: true });
-    app.post("/addfood", async (req, res) => {
-      const newFoodItem = req.body;
-      const queryFoodName = newFoodItem.foodName;
-      const existingFoodItem = await foodCollection.findOne({
+    // app.post("/addItem", async (req, res) => {
+    //   const newFoodItem = req.body;
+    //   const queryFoodName = newFoodItem.foodName;
+    //   const existingFoodItem = await foodsCollection.findOne({
+    //     foodName: queryFoodName,
+    //   });
+    //   const result = await foodsCollection.insertOne(newFoodItem);
+    //   res.send(result);
+
+    //   if (existingFoodItem) {
+    //     return res.status(200).json({ message: "Food item already exists" });
+    //   } else {
+    //     if (result.insertedCount === 1) {
+    //       res.send(result);
+    //       return res
+    //         .status(201)
+    //         .json({ message: "Food item added successfully" });
+    //     } else {
+    //       return res
+    //         .status(500)
+    //         .json({ message: "An error occurred while adding the food item" });
+    //     }
+    //   }
+    // });
+
+    app.post("/addItem", async (req, res) => {
+      const newitem = req?.body;
+      const queryFoodName = newitem?.foodName;
+      const existingFoodItem = await foodsCollection.findOne({
         foodName: queryFoodName,
       });
+
       if (existingFoodItem) {
-        return res.status(200).json({ message: "Food item already exists" });
+        return res.send({ message: "Already Exists" });
       } else {
-        const result = await foodCollection.insertOne(newFoodItem);
-        if (result.insertedCount === 1) {
-          res.send(result);
-          return res
-            .status(201)
-            .json({ message: "Food item added successfully" });
-        } else {
-          return res
-            .status(500)
-            .json({ message: "An error occurred while adding the food item" });
-        }
+        const result = foodsCollection.insertOne(newitem);
+        res.send({ message: "Added" });
       }
     });
 
