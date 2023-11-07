@@ -37,7 +37,7 @@ async function run() {
     });
 
     // post method for addFoodItem
-    app.post("/addItem", async (req, res) => {
+    app.post("/addFood", async (req, res) => {
       const newFoodItem = req?.body;
       const queryFoodName = newFoodItem?.foodName;
       const existingFoodItem = await foodsCollection.findOne({
@@ -114,6 +114,14 @@ async function run() {
           message: "This Food Item is not Available right now.",
         });
       }
+    });
+
+    // get method for purchase food item page
+    app.get("/foodItem/:foodName", async (req, res) => {
+      const foodName = req.params.foodName;
+      const query = { foodName: foodName };
+      const result = await foodsCollection.findOne(query);
+      res.send(result);
     });
 
     console.log(
