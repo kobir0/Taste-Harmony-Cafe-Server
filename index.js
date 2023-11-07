@@ -144,6 +144,17 @@ async function run() {
       res.send(result);
     });
 
+    // get method for top 6 food items
+    // Define a route to get the top 6 food items
+    app.get("/topfooditems", async (req, res) => {
+      const result = await foodsCollection
+        .find({ count: { $gt: 0 } }) // Filter items with count greater than 0
+        .sort({ count: -1 })
+        .limit(6) // Limit the results to 6 items
+        .toArray();
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
