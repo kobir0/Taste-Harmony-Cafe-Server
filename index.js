@@ -124,6 +124,26 @@ async function run() {
       res.send(result);
     });
 
+    // get orders method user specific
+    app.get("/user/orders", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await ordersCollection.find().toArray();
+      res.send(result);
+    });
+
+    // food added by user
+    app.get("/user/addedfooditems", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { userEmail: req.query.email };
+      }
+      const result = await foodsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
