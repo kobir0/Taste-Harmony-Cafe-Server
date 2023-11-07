@@ -1,7 +1,7 @@
 // @ts-nocheck
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -145,13 +145,28 @@ async function run() {
     });
 
     // get method for top 6 food items
-    // Define a route to get the top 6 food items
     app.get("/topfooditems", async (req, res) => {
       const result = await foodsCollection
-        .find({ count: { $gt: 0 } }) // Filter items with count greater than 0
+        .find({ count: { $gt: 0 } })
         .sort({ count: -1 })
-        .limit(6) // Limit the results to 6 items
+        .limit(6)
         .toArray();
+      res.send(result);
+    });
+
+    // food item delete method
+    app.delete("/user/delete-foodItem/:orderId", async (req, res) => {
+      const id = req.params.orderId;
+      const query = { _id: new ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // get method for update foodItem
+    app.get("user/addedFoodItems/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodsCollection.findOne(query);
       res.send(result);
     });
 
