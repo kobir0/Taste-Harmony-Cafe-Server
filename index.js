@@ -1,13 +1,19 @@
 // @ts-nocheck
 const express = require("express");
 const cors = require("cors");
+
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.zdityrz.mongodb.net/?retryWrites=true&w=majority`;
@@ -155,8 +161,8 @@ async function run() {
     });
 
     // food item delete method
-    app.delete("/user/delete-foodItem/:orderId", async (req, res) => {
-      const id = req.params.orderId;
+    app.delete("/deleteFood/:id", async (req, res) => {
+      const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await ordersCollection.deleteOne(query);
       res.send(result);
