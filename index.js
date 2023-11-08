@@ -1,20 +1,17 @@
 // @ts-nocheck
 const express = require("express");
 const cors = require("cors");
-
+// var jwt = require("jsonwebtoken");
+// const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(
-  cors({
-    origin: ["http://localhost:5173"],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
+// app.use(cookieParser());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.zdityrz.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -26,6 +23,14 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+// middleware
+// const verifyToken = (req, res, next) => {
+//   const token = req?.cookies?.token;
+//   console.log("Cookies in the middleware", token);
+//   next();
+// };
+// verifyToken
 
 async function run() {
   try {
@@ -169,12 +174,34 @@ async function run() {
     });
 
     // get method for update foodItem
-    app.get("user/addedFoodItems/:id", async (req, res) => {
+    app.get("/fooditems/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.findOne(query);
       res.send(result);
     });
+
+    // auth related api
+    // app.post("/access-token", async (req, res) => {
+    //   const user = req.body;
+    //   console.log("User for token", user);
+    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    //     expiresIn: "10h",
+    //   });
+    //   res
+    //     .cookie("Token", token, {
+    //       httpOnly: true,
+    //       secure: true,
+    //       sameSite: "none",
+    //     })
+    //     .send({ success: true });
+    // });
+
+    // app.post("/logout", async (req, res) => {
+    //   const user = req.body;
+    //   console.log("Logging out", user);
+    //   res.clearCookie("Token", { maxAge: 0 }).send({ success: true });
+    // });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
