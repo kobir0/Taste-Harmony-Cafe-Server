@@ -181,6 +181,29 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/fooditems/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateFoodItem = req.body;
+      const foodItem = {
+        $set: {
+          foodName: updateFoodItem.foodName,
+          image: updateFoodItem.image,
+          category: updateFoodItem.category,
+          quantity: updateFoodItem.quantity,
+          price: updateFoodItem.price,
+          userName: updateFoodItem.userName,
+          userEmail: updateFoodItem.userEmail,
+          country: updateFoodItem.country,
+          shortDescription: updateFoodItem.shortDescription,
+          description: updateFoodItem.description,
+        },
+      };
+      const result = await foodsCollection.updateOne(filter, foodItem, options);
+      res.send(result);
+    });
+
     // auth related api
     // app.post("/access-token", async (req, res) => {
     //   const user = req.body;
